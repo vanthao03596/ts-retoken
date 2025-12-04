@@ -182,6 +182,7 @@ The object returned by `createRetoken()`:
 | Method | Type | Description |
 |--------|------|-------------|
 | `fetch` | `(url: string, options?: RetokenFetchOptions) => Promise<Response>` | Fetch wrapper with auto-refresh |
+| `fetchJson` | `<T>(url: string, options?: RetokenFetchJsonOptions) => Promise<T>` | Type-safe fetch that returns parsed JSON |
 | `refreshToken` | `() => Promise<TokenPair>` | Manually trigger token refresh |
 | `isTokenExpiringSoon` | `() => boolean` | Check if access token expires soon |
 | `parseTokenExpiration` | `(token: string) => number \| null` | Parse JWT expiration (ms) |
@@ -197,6 +198,79 @@ Options for the `fetch` wrapper (extends `RequestInit`):
 | `headers` | `Record<string, string>` | - | Request headers |
 | `skipProactiveRefresh` | `boolean` | `false` | Skip proactive token refresh |
 | `skipRetry` | `boolean` | `false` | Skip retry on retryStatuses |
+
+### RetokenFetchJsonOptions
+
+Options for the `fetchJson` wrapper (extends `RetokenFetchOptions`):
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `expectedStatuses` | `number[]` | `[200, 201]` | HTTP status codes that indicate success |
+
+### `fetchJson<T>(url, options)`
+
+Type-safe fetch wrapper that returns parsed JSON with automatic token management.
+
+**Features:**
+- Proactively refreshes token if expiring soon (unless `skipProactiveRefresh` is true)
+- Retries with a new token on 401 responses (unless `skipRetry` is true)
+- Parses response body as JSON with full type safety
+- Throws `FetchError` for unexpected HTTP status codes
+- Returns `null` for 204 No Content responses
+
+**Basic Usage:**
+
+```typescript
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+// GET request - response is typed as User
+const user = await retoken.fetchJson<User>('/api/users/me');
+console.log(user.name); // Fully typed
+```
+
+**POST Request with Custom Status Codes:**
+
+```typescript
+interface CreateUserResponse {
+  id: string;
+  createdAt: string;
+}
+
+const newUser = await retoken.fetchJson<CreateUserResponse>('/api/users', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name: 'John', email: 'john@example.com' }),
+  expectedStatuses: [201], // Only 201 is considered success
+});
+```
+
+**Error Handling:**
+
+```typescript
+import { FetchError } from 'ts-retoken';
+
+try {
+  const data = await retoken.fetchJson<SomeType>('/api/resource');
+} catch (error) {
+  if (error instanceof FetchError) {
+    console.log(error.message); // "Request failed with status 404"
+    console.log(error.status);  // 404
+    console.log(error.body);    // Parsed error response body (if JSON)
+  }
+}
+```
+
+**FetchError Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `message` | `string` | Error message including status code |
+| `status` | `number` | HTTP status code |
+| `body` | `unknown` | Parsed response body (if JSON) or `null` |
 
 ## Standalone Utilities
 
