@@ -6,6 +6,27 @@ interface JwtPayload {
 }
 
 /**
+ * Decode a base64url encoded string (RFC 4648)
+ * Handles URL-safe characters (-_) and missing padding
+ */
+function base64UrlDecode(str: string): string {
+  // Replace URL-safe chars with standard base64
+  let output = str.replace(/-/g, '+').replace(/_/g, '/');
+
+  // Add padding if needed
+  switch (output.length % 4) {
+    case 2:
+      output += '==';
+      break;
+    case 3:
+      output += '=';
+      break;
+  }
+
+  return atob(output);
+}
+
+/**
  * Parse the expiration timestamp (in milliseconds) from a JWT token
  * Returns null if token is invalid or has no exp claim
  *
@@ -17,7 +38,7 @@ export function parseTokenExpiration(token: string): number | null {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
 
-    const payload = JSON.parse(atob(parts[1])) as JwtPayload;
+    const payload = JSON.parse(base64UrlDecode(parts[1])) as JwtPayload;
     if (typeof payload.exp !== 'number') return null;
 
     return payload.exp * 1000;
