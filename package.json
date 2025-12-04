@@ -1,0 +1,26 @@
+{
+  "name": "ts-retoken",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "module": "./dist/ts-retoken.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/ts-retoken.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsc",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4"
+  }
+}
