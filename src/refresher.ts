@@ -136,9 +136,7 @@ export function createRefresher<TResponse = unknown>(
   };
 
   // Perform refresh with retry logic
-  const performRefreshWithRetry = async (
-    refreshToken?: string
-  ): Promise<TokenPair> => {
+  const performRefreshWithRetry = async (refreshToken?: string): Promise<TokenPair> => {
     for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
       try {
         return await performRefresh(refreshToken);
@@ -150,9 +148,7 @@ export function createRefresher<TResponse = unknown>(
 
         // Check if this is a client error (don't retry if configured)
         const isClientError =
-          error instanceof RefreshError &&
-          error.status >= 400 &&
-          error.status < 500;
+          error instanceof RefreshError && error.status >= 400 && error.status < 500;
 
         if ((skipOnClientError && isClientError) || attempt === retryDelays.length) {
           throw error;

@@ -54,10 +54,7 @@ export function parseTokenExpiration(token: string): number | null {
  * @param leewaySeconds - Seconds before expiration to consider "expiring soon"
  * @returns true if token is null, invalid, or expiring soon
  */
-export function isTokenExpiringSoon(
-  token: string | null,
-  leewaySeconds: number
-): boolean {
+export function isTokenExpiringSoon(token: string | null, leewaySeconds: number): boolean {
   if (!token) return true;
 
   const exp = parseTokenExpiration(token);

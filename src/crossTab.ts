@@ -28,9 +28,7 @@ interface AuthMessage {
  * @param config - Configuration for cross-tab sync
  * @returns CrossTabSync instance or null
  */
-export function createCrossTabSync(
-  config: CrossTabSyncConfig
-): CrossTabSync | null {
+export function createCrossTabSync(config: CrossTabSyncConfig): CrossTabSync | null {
   // Check if BroadcastChannel is available
   if (typeof BroadcastChannel === 'undefined') {
     return null;

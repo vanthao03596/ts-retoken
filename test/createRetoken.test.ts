@@ -7,11 +7,7 @@ import {
   setupFetchMock,
   createRefreshResponse,
 } from './helpers/mockFetch';
-import {
-  createValidToken,
-  createSoonExpiringToken,
-  createToken,
-} from './helpers/tokens';
+import { createValidToken, createSoonExpiringToken, createToken } from './helpers/tokens';
 
 describe('createRetoken', () => {
   let cleanup: () => void;
@@ -32,8 +28,8 @@ describe('createRetoken', () => {
     cleanup = setupFetchMock(mockFetch);
 
     tokenStore = {
-      accessToken: 'accessToken' in options ? options.accessToken ?? null : createValidToken(),
-      refreshToken: 'refreshToken' in options ? options.refreshToken ?? null : createValidToken(),
+      accessToken: 'accessToken' in options ? (options.accessToken ?? null) : createValidToken(),
+      refreshToken: 'refreshToken' in options ? (options.refreshToken ?? null) : createValidToken(),
     };
 
     const onAuthFailure = options.onAuthFailure ?? vi.fn();
@@ -88,11 +84,11 @@ describe('createRetoken', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         '/api/users',
         expect.objectContaining({
-          headers: expect.any(Headers),
+          headers: expect.any(Headers) as unknown,
         })
       );
 
-      const headers = mockFetch.mock.calls[0][1].headers as Headers;
+      const headers = (mockFetch.mock.calls[0][1] as RequestInit).headers as Headers;
       expect(headers.get('Authorization')).toBe(`Bearer ${accessToken}`);
     });
 
@@ -106,7 +102,7 @@ describe('createRetoken', () => {
 
       await retoken.fetch('/api/public', { skipProactiveRefresh: true });
 
-      const headers = mockFetch.mock.calls[0][1].headers as Headers;
+      const headers = (mockFetch.mock.calls[0][1] as RequestInit).headers as Headers;
       expect(headers.get('Authorization')).toBeNull();
     });
 
@@ -120,7 +116,7 @@ describe('createRetoken', () => {
         headers: { 'X-Custom': 'value' },
       });
 
-      const headers = mockFetch.mock.calls[0][1].headers as Headers;
+      const headers = (mockFetch.mock.calls[0][1] as RequestInit).headers as Headers;
       expect(headers.get('Authorization')).toBe(`Bearer ${accessToken}`);
       expect(headers.get('X-Custom')).toBe('value');
     });

@@ -77,10 +77,7 @@ export function createTokenWithoutExp(): string {
 /**
  * Create a token with additional claims
  */
-export function createTokenWithClaims(
-  expSeconds: number,
-  claims: Record<string, unknown>
-): string {
+export function createTokenWithClaims(expSeconds: number, claims: Record<string, unknown>): string {
   const header = { alg: 'HS256' };
   const payload = { exp: expSeconds, ...claims };
 

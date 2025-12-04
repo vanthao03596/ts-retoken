@@ -115,10 +115,13 @@ describe('createRefresher', () => {
 
       await refresher.refresh();
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/refresh', expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ refresh_token: 'my-refresh-token' }),
-      }));
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/refresh',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ refresh_token: 'my-refresh-token' }),
+        })
+      );
     });
 
     it('should not send body in cookie mode (no getRefreshToken)', async () => {
@@ -128,10 +131,13 @@ describe('createRefresher', () => {
 
       await refresher.refresh();
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/refresh', expect.objectContaining({
-        method: 'POST',
-      }));
-      const callArgs = mockFetch.mock.calls[0][1];
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/refresh',
+        expect.objectContaining({
+          method: 'POST',
+        })
+      );
+      const callArgs = mockFetch.mock.calls[0][1] as RequestInit;
       expect(callArgs.body).toBeUndefined();
     });
   });
@@ -266,7 +272,9 @@ describe('createRefresher', () => {
       const refreshPromise = refresher.refresh();
 
       // Attach error handler to prevent unhandled rejection
-      refreshPromise.catch(() => {});
+      refreshPromise.catch(() => {
+        // Intentionally empty - just prevents unhandled rejection
+      });
 
       // Advance through all retries
       await vi.advanceTimersByTimeAsync(100);

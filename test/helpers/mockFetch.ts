@@ -55,9 +55,7 @@ export function createMockFetch(config: MockResponseConfig = {}): ReturnType<typ
  * Create a mock fetch function that returns responses in sequence
  * Useful for testing retry logic
  */
-export function createSequentialMockFetch(
-  configs: MockResponseConfig[]
-): ReturnType<typeof vi.fn> {
+export function createSequentialMockFetch(configs: MockResponseConfig[]): ReturnType<typeof vi.fn> {
   let callIndex = 0;
   return vi.fn().mockImplementation(() => {
     const config = configs[callIndex] ?? configs[configs.length - 1];
@@ -69,7 +67,9 @@ export function createSequentialMockFetch(
 /**
  * Create a mock fetch that rejects with an error
  */
-export function createFailingFetch(error: Error = new Error('Network error')): ReturnType<typeof vi.fn> {
+export function createFailingFetch(
+  error: Error = new Error('Network error')
+): ReturnType<typeof vi.fn> {
   return vi.fn().mockRejectedValue(error);
 }
 
