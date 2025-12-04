@@ -1,6 +1,6 @@
 {
   "name": "ts-retoken",
-  "private": true,
+  "private": false,
   "version": "0.0.1",
   "type": "module",
   "module": "./dist/ts-retoken.js",
