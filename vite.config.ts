@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -12,5 +13,10 @@ export default defineConfig({
       fileName: 'ts-retoken',
       formats: ['es'],
     },
+  },
+  test: {
+    globals: true,
+    environment: 'node',
+    include: ['test/**/*.test.ts'],
   },
 })
