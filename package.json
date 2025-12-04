@@ -1,7 +1,26 @@
 {
   "name": "ts-retoken",
-  "private": false,
   "version": "0.0.1",
+  "description": "Lightweight TypeScript library for automatic JWT token refresh with cross-tab synchronization",
+  "keywords": [
+    "token",
+    "refresh",
+    "jwt",
+    "authentication",
+    "typescript",
+    "cross-tab",
+    "auth"
+  ],
+  "author": "phamthao03596@gmail.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vanthao03596/ts-retoken.git"
+  },
+  "homepage": "https://github.com/vanthao03596/ts-retoken#readme",
+  "bugs": {
+    "url": "https://github.com/vanthao03596/ts-retoken/issues"
+  },
   "type": "module",
   "module": "./dist/ts-retoken.js",
   "types": "./dist/index.d.ts",
