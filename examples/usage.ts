@@ -415,7 +415,95 @@ async function robustFetch<T>(url: string): Promise<T> {
 }
 
 // ============================================================
-// Step 9: Integration with State Management
+// Step 9: Dynamic Callbacks with React Hooks
+// ============================================================
+
+/**
+ * When using React Router or other hooks inside onAuthFailure,
+ * you need a ref pattern since callbacks are captured at creation time.
+ *
+ * This pattern allows you to use hooks like useNavigate() in callbacks.
+ */
+
+// lib/authClient.ts - Create retoken with mutable callback holder
+interface AuthCallbacks {
+  onAuthFailure: () => void;
+  onTokenRefresh: (tokens: TokenPair) => void;
+}
+
+const authCallbacks: AuthCallbacks = {
+  onAuthFailure: () => {},
+  onTokenRefresh: () => {},
+};
+
+const retokenWithDynamicCallbacks = createRetoken<MyRefreshResponse>({
+  refreshEndpoint: {
+    url: 'https://api.example.com/auth/refresh',
+    parseResponse: (data) => ({
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+    }),
+  },
+  getAccessToken: () => localStorage.getItem('access_token'),
+  getRefreshToken: () => localStorage.getItem('refresh_token'),
+  setTokens: (tokens) => {
+    localStorage.setItem('access_token', tokens.accessToken);
+    localStorage.setItem('refresh_token', tokens.refreshToken);
+  },
+  clearTokens: () => localStorage.clear(),
+  // Callbacks delegate to mutable refs
+  onAuthFailure: () => authCallbacks.onAuthFailure(),
+  onTokenRefresh: (tokens) => authCallbacks.onTokenRefresh(tokens),
+});
+
+/**
+ * React Provider component that sets up dynamic callbacks
+ *
+ * // AuthProvider.tsx
+ * import { useEffect } from 'react';
+ * import { useNavigate } from 'react-router-dom';
+ * import { authCallbacks } from './authClient';
+ *
+ * export function AuthProvider({ children }: { children: React.ReactNode }) {
+ *   const navigate = useNavigate();
+ *
+ *   useEffect(() => {
+ *     // Set callbacks that can use React hooks
+ *     authCallbacks.onAuthFailure = () => {
+ *       navigate('/login');
+ *     };
+ *
+ *     authCallbacks.onTokenRefresh = (tokens) => {
+ *       console.log('Tokens refreshed:', tokens.accessToken.slice(0, 20) + '...');
+ *     };
+ *
+ *     // Cleanup on unmount
+ *     return () => {
+ *       authCallbacks.onAuthFailure = () => {};
+ *       authCallbacks.onTokenRefresh = () => {};
+ *     };
+ *   }, [navigate]);
+ *
+ *   return <>{children}</>;
+ * }
+ *
+ * // App.tsx
+ * import { BrowserRouter } from 'react-router-dom';
+ * import { AuthProvider } from './AuthProvider';
+ *
+ * function App() {
+ *   return (
+ *     <BrowserRouter>
+ *       <AuthProvider>
+ *         <Routes />
+ *       </AuthProvider>
+ *     </BrowserRouter>
+ *   );
+ * }
+ */
+
+// ============================================================
+// Step 10: Integration with State Management
 // ============================================================
 
 /**
@@ -469,7 +557,9 @@ export {
   retokenInferred,
   retokenCookie,
   retokenWithCrossTab,
+  retokenWithDynamicCallbacks,
   retokenWithStore,
+  authCallbacks,
 
   // Type-safe fetchJson examples
   fetchUsers,

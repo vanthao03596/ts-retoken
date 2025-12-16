@@ -299,7 +299,13 @@ try {
 
 ```typescript
 // lib/auth.ts
-import { createRetoken } from 'ts-retoken';
+import { createRetoken, TokenPair } from 'ts-retoken';
+
+// Mutable callback holder for React hooks integration
+export const authCallbacks = {
+  onAuthFailure: () => {},
+  onTokenRefresh: (_tokens: TokenPair) => {},
+};
 
 export const retoken = createRetoken({
   refreshEndpoint: {
@@ -317,11 +323,36 @@ export const retoken = createRetoken({
   },
   clearTokens: () => localStorage.clear(),
   crossTab: { enabled: true },
-  onAuthFailure: () => {
-    window.location.href = '/login';
-  },
+  // Delegate to mutable callbacks
+  onAuthFailure: () => authCallbacks.onAuthFailure(),
+  onTokenRefresh: (tokens) => authCallbacks.onTokenRefresh(tokens),
 });
+```
 
+```typescript
+// AuthProvider.tsx - Set callbacks with React hooks
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { authCallbacks } from './auth';
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    authCallbacks.onAuthFailure = () => {
+      navigate('/login');
+    };
+
+    return () => {
+      authCallbacks.onAuthFailure = () => {};
+    };
+  }, [navigate]);
+
+  return <>{children}</>;
+}
+```
+
+```typescript
 // Use in components
 const users = await retoken.fetch('/api/users').then(r => r.json());
 ```
