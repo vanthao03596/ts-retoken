@@ -5,13 +5,19 @@ import eslintConfigPrettier from 'eslint-config-prettier/flat';
 
 export default tseslint.config(
   eslint.configs.recommended,
-  tseslint.configs.recommendedTypeChecked,
-  tseslint.configs.stylisticTypeChecked,
-  eslintConfigPrettier,
   {
+    ignores: ['dist/', 'node_modules/', '*.js', '*.mjs'],
+  },
+  {
+    files: ['src/**/*.ts', 'src/**/*.tsx', 'test/**/*.ts', 'test/**/*.tsx'],
+    extends: [
+      ...tseslint.configs.recommendedTypeChecked,
+      ...tseslint.configs.stylisticTypeChecked,
+      eslintConfigPrettier,
+    ],
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        project: './tsconfig.eslint.json',
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -21,8 +27,5 @@ export default tseslint.config(
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
     },
-  },
-  {
-    ignores: ['dist/', 'node_modules/', '*.js', '*.mjs'],
   }
 );
