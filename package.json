@@ -1,6 +1,6 @@
 {
   "name": "ts-retoken",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "Lightweight TypeScript library for automatic JWT token refresh with cross-tab synchronization",
   "keywords": [
     "token",
